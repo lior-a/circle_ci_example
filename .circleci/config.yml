@@ -1,0 +1,39 @@
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+version: 2.1
+
+jobs:
+  # Job #1
+  build:
+    # The primary container is an instance of the first image listed. The job's commands run in this container.
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:11.10
+    working_directory: ~/app
+    steps:
+      - checkout
+      # cache dependencies (to speed automtion process)
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Install NPM dependencies - via yarn
+          command: yarn install
+      - run:
+          name: Install Jest Global
+          command: yarn global add jest
+      - run:
+          name: Build Production Assets
+          command: yarn run build
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is 
+          # taken to be the root directory of the workspace.
+          root: ~/app
+          # Must be relative path from root
+          paths:
+            - node_modules  # contain dependencies 
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}

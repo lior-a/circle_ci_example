@@ -11,7 +11,7 @@ jobs:
     working_directory: ~/app
     steps:
       - checkout
-      # cache dependencies (to speed automtion process)
+      # cache dependencies (to speed automation process)
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
